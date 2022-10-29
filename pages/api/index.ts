@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import mem from "mem";
 
 type Data = {
   // name: string;
@@ -49,13 +50,21 @@ const getUser = (row: number, col: number, user: GhUser) => {
 </a>`;
 };
 
-const getUsers = async (repos: string[]) => {
+const fetchRepo = async (repo: string) => {
+  console.log(`fetching ${repo}`);
+  const res = await fetch(`https://api.github.com/repos/${repo}/contributors`);
+  return res.json() as Promise<GhUser[]>;
+};
+
+const memFetchRepo = mem(fetchRepo, {
+  maxAge: 1000 * 60 * 60 * 24,
+});
+
+const fetchRepos = async (repos: string[]) => {
   const users = await Promise.all(
     repos.map(async (repo) => {
-      const res = await fetch(
-        `https://api.github.com/repos/${repo}/contributors`
-      );
-      return res.json() as Promise<GhUser[]>;
+      const users = await memFetchRepo(repo);
+      return users;
     })
   );
   return users.flat().filter((item, index, arr) => {
@@ -76,7 +85,7 @@ export default async function handler(
     res.status(302).redirect("https://contributors.nn.ci");
     return;
   }
-  const users = (await getUsers(repos)) as GhUser[];
+  const users = (await fetchRepos(repos)) as GhUser[];
   const cols = parseInt((req.query.cols as string) ?? "12");
   const rows = Math.ceil(users.length / cols);
   let svg = getHead(rows, cols);
