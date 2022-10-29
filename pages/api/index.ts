@@ -46,56 +46,91 @@ const getUser = (row: number, col: number, user: GhUser) => {
       <rect width="64" height="64" x="${x}" y="${y}" rx="32" />
     </clipPath>
   </defs>
-  <image class="avatar" clip-path="url(#${user.login})" x="${x}" y="${y}" width="64" height="64" xlink:href="${user.avatar_url}" />
+  <image class="avatar" clip-path="url(#${user.login})" x="${x}" y="${y}" width="64" height="64" xlink:href="data:image/png;base64,${user.avatar_url}" />
 </a>`;
+};
+
+const fetchAvatar = async (url: string) => {
+  const response = await fetch(url);
+  return Buffer.from(await response.arrayBuffer()).toString("base64");
 };
 
 const fetchRepo = async (repo: string) => {
   console.log(`fetching ${repo}`);
   const res = await fetch(`https://api.github.com/repos/${repo}/contributors`);
-  return res.json() as Promise<GhUser[]>;
+  const users = await res.json();
+  if (users.message) {
+    throw new Error(`failed to fetch repo ${repo}: ${users.message}`);
+  }
+  return users as GhUser[];
 };
 
 const memFetchRepo = mem(fetchRepo, {
   maxAge: 1000 * 60 * 60 * 24,
 });
 
+const memFetchAvatar = mem(fetchAvatar, {
+  maxAge: 1000 * 60 * 60 * 24,
+});
+
 const fetchRepos = async (repos: string[]) => {
-  const users = await Promise.all(
-    repos.map(async (repo) => {
-      const users = await memFetchRepo(repo);
-      return users;
-    })
+  const users = (
+    await Promise.all(
+      repos.map(async (repo) => {
+        const users = await memFetchRepo(repo);
+        return users;
+      })
+    )
+  )
+    .flat()
+    .filter((item, index, arr) => {
+      return arr.findIndex((t) => t.login === item.login) === index;
+    });
+  await Promise.all(
+    users.map(
+      async (user: GhUser) =>
+        (user.avatar_url = await memFetchAvatar(user.avatar_url))
+    )
   );
-  return users.flat().filter((item, index, arr) => {
-    return arr.findIndex((t) => t.login === item.login) === index;
-  });
+  return users;
 };
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const repos = [];
-  if (typeof req.query.repo === "string") {
-    repos.push(req.query.repo);
-  } else if (Array.isArray(req.query.repo)) {
-    repos.push(...req.query.repo);
-  } else {
-    res.status(302).redirect("https://contributors.nn.ci");
-    return;
+  try {
+    const repos = [];
+    if (typeof req.query.repo === "string") {
+      repos.push(req.query.repo);
+    } else if (Array.isArray(req.query.repo)) {
+      repos.push(...req.query.repo);
+    } else {
+      // res.status(302).redirect("https://contributors.nn.ci");
+      // return;
+      throw new Error("repo is required");
+    }
+    const users = (await fetchRepos(repos)) as GhUser[];
+    const cols = parseInt((req.query.cols as string) ?? "12");
+    const rows = Math.ceil(users.length / cols);
+    let svg = getHead(rows, cols);
+    for (let i = 0; i < users.length; i++) {
+      svg += getUser(Math.floor(i / cols), i % cols, users[i]);
+    }
+    svg += foot;
+    res
+      .setHeader("Content-Type", "image/svg+xml")
+      .setHeader("Cache-Control", "public, max-age=86400")
+      .status(200)
+      .send(svg);
+  } catch (e: any) {
+    res.setHeader("Content-Type", "image/svg+xml").status(500)
+      .send(`<svg xmlns="http://www.w3.org/2000/svg">
+      <foreignObject width="400" height="400">
+        <body xmlns="http://www.w3.org/1999/xhtml">
+          <p style="color: red;">${e.message}</p>
+        </body>
+      </foreignObject>
+    </svg>`);
   }
-  const users = (await fetchRepos(repos)) as GhUser[];
-  const cols = parseInt((req.query.cols as string) ?? "12");
-  const rows = Math.ceil(users.length / cols);
-  let svg = getHead(rows, cols);
-  for (let i = 0; i < users.length; i++) {
-    svg += getUser(Math.floor(i / cols), i % cols, users[i]);
-  }
-  svg += foot;
-  res
-    .setHeader("Content-Type", "image/svg+xml")
-    .setHeader("Cache-Control", "public, max-age=86400")
-    .status(200)
-    .send(svg);
 }
