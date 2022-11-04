@@ -29,7 +29,7 @@ export default function Home() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="p-2 rounded-md outline-none"
+          className="p-2 rounded-md outline-none bg-gray-300/20"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               if (repos.includes(text)) return;
