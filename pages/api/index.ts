@@ -77,10 +77,21 @@ const fetchRepo = async (repo: string) => {
     return userCache.get(repo)!;
   }
   console.log(`fetching ${repo}`);
-  const res = await fetch(`https://api.github.com/repos/${repo}/contributors`);
-  const users = await res.json();
-  if (users.message) {
-    throw new Error(`failed to fetch repo ${repo}: ${users.message}`);
+  const users = [];
+  let page = 1;
+  while (true) {
+    const res = await fetch(
+      `https://api.github.com/repos/${repo}/contributors?per_page=100&page=${page}`
+    );
+    const usersPage = await res.json();
+    if (usersPage.message) {
+      throw new Error(`failed to fetch repo ${repo}: ${usersPage.message}`);
+    }
+    if (usersPage.length === 0) {
+      break;
+    }
+    users.push(...usersPage);
+    page++;
   }
   const usersUse = (users as GhUser[]).map((user) => {
     return {
