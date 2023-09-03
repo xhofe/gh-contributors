@@ -76,7 +76,7 @@ export default function Home() {
               key={repo}
               className="flex gap-1 items-center font-mono bg-gray-300/20 p-2 rounded-md"
             >
-              <p>{repo}</p>
+              <p className="break-all">{repo}</p>
               <p
                 className="cursor-pointer px-2 hover:bg-gray-300/30 rounded-md"
                 onClick={() => {
@@ -91,16 +91,20 @@ export default function Home() {
         {repos.length > 0 && (
           <>
             <img src={svg} alt="svg" />
-            <div className="flex font-mono bg-gray-300/20 p-4 rounded-md justify-between">
-              <p>http://contributors.nn.ci{svg}</p>
+            <div className="flex font-mono bg-gray-300/20 p-4 rounded-md justify-between items-center break-all">
+              <p>
+                {location.origin}
+                {svg}
+              </p>
               <p
                 onClick={() => {
-                  copy(`http://contributors.nn.ci${svg}`);
+                  copy(`${location.origin}${svg}`);
                   setCopied(true);
                   setTimeout(() => {
                     setCopied(false);
                   }, 1000);
                 }}
+                className="bg-gray-300/25 px-2 py-1 rounded-md cursor-pointer hover:bg-gray-300/30 ml-2"
               >
                 {copied ? "Copied!" : "Copy"}
               </p>
