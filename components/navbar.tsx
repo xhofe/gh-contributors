@@ -1,13 +1,13 @@
+"use client"
+
 import {
   Navbar as NextUINavbar,
   NavbarContent,
-  NavbarBrand,
   NavbarItem,
-} from "@nextui-org/navbar"
-import { Button } from "@nextui-org/button"
-import { Link } from "@nextui-org/link"
+  Button,
+  Link,
+} from "@nextui-org/react"
 import { siteConfig } from "@/config/site"
-import NextLink from "next/link"
 import { ThemeSwitch } from "@/components/theme-switch"
 import { GithubIcon, HeartFilledIcon } from "@/components/icons"
 

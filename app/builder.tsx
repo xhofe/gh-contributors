@@ -1,7 +1,6 @@
 "use client"
 
-import { Button } from "@nextui-org/button"
-import { Input } from "@nextui-org/input"
+import { Button, Input } from "@nextui-org/react"
 import copy from "copy-to-clipboard"
 import { useState, useMemo } from "react"
 
@@ -13,10 +12,11 @@ export function Builder() {
   }, [repos])
   const [copied, setCopied] = useState(false)
   return (
-    <div className="w-full pt-4 md:px-10 flex gap-2 flex-col">
+    <div className="w-full pt-4 md:px-10 lg:px-[20%] flex gap-2 flex-col">
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}
+        placeholder="Input your repo as owner/repo"
         className="w-full"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
