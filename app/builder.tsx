@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Input } from "@nextui-org/react"
+import { Button, Image, Input } from "@nextui-org/react"
 import copy from "copy-to-clipboard"
 import { useState, useMemo } from "react"
 
@@ -17,7 +17,7 @@ export function Builder() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Input your repo as owner/repo"
-        className="w-full"
+        className="w-full font-mono"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (repos.includes(text)) return
@@ -46,7 +46,7 @@ export function Builder() {
       </div>
       {repos.length > 0 && (
         <>
-          <img src={svg} alt="svg" />
+          <Image src={svg} alt="svg" />
           <div className="flex font-mono bg-gray-300/20 p-3 rounded-md justify-between items-center break-all">
             <p>
               {location.origin}
