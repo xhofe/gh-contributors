@@ -1,40 +1,32 @@
-# Next.js & NextUI Template
+# gh-contributors
 
-This is a template for creating applications using Next.js 13 (app directory) and NextUI (v2).
+Automatically generate an svg with all contributors for your repository.
 
-## Technologies Used
+## Usage
 
-- [Next.js 13](https://nextjs.org/docs/getting-started)
-- [NextUI v2](https://nextui.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
-
-## How to Use
-
-
-### Use the template with create-next-app
-
-To create a new project based on this template using `create-next-app`, run the following command:
-
-```bash
-npx create-next-app -e https://github.com/nextui-org/next-app-template
+```
+https://contrib.nn.ci/api?repo=[user/repo]
 ```
 
-### Install dependencies
+Or generate online with [gh-contributors](https://contrib.nn.ci/)
 
-```bash
-npm install
-```
+The following parameters are available:
 
-### Run the development server
+- repo: The repository to generate the svg for, e.g. `Xhofe/gh-contributors`, required & multiple;
+- cols: Number of avatars per row (default: 12)
+
+## Example
+
+![Contributors](https://contrib.nn.ci/api?repo=alist-org/alist&repo=alist-org/alist-web&repo=alist-org/docs)
+
+## Getting Started
+
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
 ```
 
-## License
-
-Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
