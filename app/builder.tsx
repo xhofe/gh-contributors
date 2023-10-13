@@ -3,17 +3,27 @@
 import { Button, Card, CardBody, Chip, Image, Input } from "@nextui-org/react"
 import copy from "copy-to-clipboard"
 import { useState, useMemo } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export function Builder() {
-  const [text, setText] = useState("")
-  const [repos, setRepos] = useState<string[]>([])
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const repos = searchParams.getAll("repo")
+  function setRepos(_repos: string[]) {
+    const params = new URLSearchParams()
+    _repos.forEach((repo) => params.append("repo", repo))
+    router.replace(`${pathname}?${params.toString()}`)
+  }
+  // const [repos, setRepos] = useState<string[]>([])
   const svg = useMemo(() => {
     return `/api?` + repos.map((repo) => `repo=${repo}`).join("&")
   }, [repos])
+  const [text, setText] = useState("")
   const [copied, setCopied] = useState(false)
   function add() {
     if (!text || repos.includes(text)) return
-    setRepos((repos) => [...repos, text])
+    setRepos([...repos, text])
     setText("")
   }
   return (
