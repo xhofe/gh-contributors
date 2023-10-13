@@ -54,7 +54,7 @@ export function Builder() {
               </Button>
             }
           />
-          <div className="flex gap-2 flex-wrap items-center">
+          <div className="flex gap-2 flex-wrap items-center font-mono">
             {repos.map((repo) => (
               <Chip
                 key={repo}
