@@ -41,6 +41,8 @@ export default function Page() {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       width={params.totalWidth}
       height={params.totalHeight}
+      viewBox={`0 0 ${params.totalWidth} ${params.totalHeight}`}
+      className="max-w-full"
     >
       {usersGroup.map((users, i) =>
         users.map((user, j) => (
