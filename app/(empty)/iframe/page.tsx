@@ -5,7 +5,7 @@ import { calParams } from "@/utils/svg"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function () {
+export default function Page() {
   const searchParams = useSearchParams()
   const repos = searchParams.getAll("repo")
   const [users, setUsers] = useState<GhUserUse[]>([])
