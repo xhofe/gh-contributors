@@ -12,6 +12,11 @@ const avatarCache = new LRUCache<string, string>({
 })
 
 export async function fetchRepo(repo: string) {
+  // validate repo
+  const repoRegex = /^[\w-]+\/[\w-]+$/
+  if (!repoRegex.test(repo)) {
+    throw new Error(`invalid repo: ${repo}`)
+  }
   if (userCache.has(repo)) {
     return userCache.get(repo)!
   }
