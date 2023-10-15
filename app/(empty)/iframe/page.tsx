@@ -1,13 +1,26 @@
 "use client"
 import { fetchRepos } from "@/app/api/github"
+import { GhUserUse } from "@/app/api/types"
 import { calParams } from "@/utils/svg"
 import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
-export default async function () {
+export default function () {
   const searchParams = useSearchParams()
-
   const repos = searchParams.getAll("repo")
-  const users = await fetchRepos(repos)
+  const [users, setUsers] = useState<GhUserUse[]>([])
+  async function fetchUsers() {
+    try {
+      const resp = await fetch("/api/json?" + searchParams.toString())
+      setUsers(await resp.json())
+    } catch (e) {}
+  }
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+  if (users.length === 0) {
+    return <div>loading...</div>
+  }
   const params = calParams({
     cols: searchParams.get("cols"),
     radius: searchParams.get("radius"),
