@@ -26,49 +26,53 @@ export function Builder() {
     setRepos([...repos, text])
     setText("")
   }
+  const inputDom = (
+    <>
+      <Input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Input your github repo as owner/repo"
+        // variant="faded"
+        // color="primary"
+        className="w-full font-mono"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            add()
+          }
+        }}
+        endContent={
+          <Button
+            size="sm"
+            color="primary"
+            onPress={() => {
+              add()
+            }}
+          >
+            Add
+          </Button>
+        }
+      />
+      <div className="flex gap-2 flex-wrap items-center font-mono">
+        {repos.map((repo) => (
+          <Chip
+            key={repo}
+            onClose={() => {
+              setRepos(repos.filter((r) => r !== repo))
+            }}
+            radius="sm"
+          >
+            {repo}
+          </Chip>
+        ))}
+      </div>
+    </>
+  )
   return (
     <div className="w-full pt-4 md:px-10 lg:px-[14%] flex gap-2 flex-col">
-      <Card>
-        <CardBody className="flex flex-col gap-3">
-          <Input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Input your github repo as owner/repo"
-            // variant="faded"
-            // color="primary"
-            className="w-full font-mono"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                add()
-              }
-            }}
-            endContent={
-              <Button
-                size="sm"
-                color="primary"
-                onPress={() => {
-                  add()
-                }}
-              >
-                Add
-              </Button>
-            }
-          />
-          <div className="flex gap-2 flex-wrap items-center font-mono">
-            {repos.map((repo) => (
-              <Chip
-                key={repo}
-                onClose={() => {
-                  setRepos(repos.filter((r) => r !== repo))
-                }}
-                radius="sm"
-              >
-                {repo}
-              </Chip>
-            ))}
-          </div>
-        </CardBody>
+      <Card className="hidden sm:flex">
+        <CardBody className="flex flex-col gap-3">{inputDom}</CardBody>
       </Card>
+      <div className="flex sm:hidden flex-col gap-3">{inputDom}</div>
       {repos.length > 0 && (
         <>
           <Image width="100%" src={svg} alt="svg" />

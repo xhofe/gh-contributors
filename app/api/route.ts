@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateSVG } from "./svg"
+import { calParams } from "@/utils/svg"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
@@ -9,9 +10,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     if (repos.length === 0) {
       throw new Error("repo is required")
     }
-
-    const cols = parseInt(searchParams.get("cols") ?? "12")
-    const svg = await generateSVG({ repos, cols })
+    const svg = await generateSVG({
+      repos,
+      cols: searchParams.get("cols"),
+      radius: searchParams.get("radius"),
+      space: searchParams.get("space"),
+    })
     return new NextResponse(svg, {
       headers: {
         "Content-Type": "image/svg+xml",

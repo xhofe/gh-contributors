@@ -1,10 +1,9 @@
+import { calParams, calParamsArg, calParamsResult } from "@/utils/svg"
 import { fetchAvatar, fetchRepos } from "./github"
 import { GhUser, GhUserUse } from "./types"
 
-export function getHead(rows: number, cols: number) {
-  const width = 5 + cols * 69
-  const height = 5 + rows * 69
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}">
+export function getHead(params: calParamsResult) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${params.totalWidth}" height="${params.totalHeight}">
   <style>.link { cursor: pointer; } .avatar { border-radius: 50%; }</style>`
 }
 
@@ -14,33 +13,37 @@ export function getUser(
   row: number,
   col: number,
   user: GhUser,
-  avatar: string
+  avatar: string,
+  params: calParamsResult
 ) {
-  const x = 5 + col * 69
-  const y = 5 + row * 69
+  const x = params.x(col)
+  const y = params.y(row)
   return `<a xlink:href="https://github.com/${user.login}" class="link" target="_blank">
   <defs>
     <clipPath id="${user.login}">
-      <rect width="64" height="64" x="${x}" y="${y}" rx="32" />
+      <rect width="${params.width}" height="${params.height}" x="${x}" y="${y}" rx="${params.radius}" />
     </clipPath>
   </defs>
-  <image class="avatar" clip-path="url(#${user.login})" x="${x}" y="${y}" width="64" height="64" xlink:href="data:image/png;base64,${avatar}" />
+  <image class="avatar" clip-path="url(#${user.login})" x="${x}" y="${y}" width="${params.width}" height="${params.height}" xlink:href="data:image/png;base64,${avatar}" />
 </a>`
 }
 
-export async function generateSVG(conf: { repos: string[]; cols: number }) {
+export async function generateSVG(
+  conf: { repos: string[] } & Omit<calParamsArg, "total">
+) {
   const users = (await fetchRepos(conf.repos)) as GhUser[]
   const avatars = await Promise.all(
     users.map(async (user: GhUserUse) => await fetchAvatar(user.avatar_url))
   )
-  const rows = Math.ceil(users.length / conf.cols)
-  let svg = getHead(rows, conf.cols)
+  const params = calParams({ ...conf, total: users.length })
+  let svg = getHead(params)
   for (let i = 0; i < users.length; i++) {
     svg += getUser(
-      Math.floor(i / conf.cols),
-      i % conf.cols,
+      Math.floor(i / params.cols),
+      i % params.cols,
       users[i],
-      avatars[i]
+      avatars[i],
+      params
     )
   }
   svg += foot
