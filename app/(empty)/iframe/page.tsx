@@ -7,7 +7,6 @@ import { useEffect, useState } from "react"
 
 export default function Page() {
   const searchParams = useSearchParams()
-  const repos = searchParams.getAll("repo")
   const [users, setUsers] = useState<GhUserUse[]>([])
   async function fetchUsers() {
     try {
@@ -46,6 +45,7 @@ export default function Page() {
       {usersGroup.map((users, i) =>
         users.map((user, j) => (
           <a
+            key={user.login}
             href={`https://github.com/${user.login}`}
             className="cursor-pointer"
             target="_blank"
