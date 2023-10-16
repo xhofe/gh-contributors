@@ -10,8 +10,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     if (repos.length === 0) {
       throw new Error("repo is required")
     }
+    const maxPages = parseInt(searchParams.get("pages") || "1")
     const svg = await generateSVG({
       repos,
+      maxPages,
       cols: searchParams.get("cols"),
       radius: searchParams.get("radius"),
       space: searchParams.get("space"),

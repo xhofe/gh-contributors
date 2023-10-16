@@ -16,7 +16,7 @@ const avatarCache = new LRUCache<string, string>({
   ttl: 1000 * 60 * 60 * 24,
 })
 
-export async function fetchRepo(repo: string) {
+export async function fetchRepo(repo: string, maxPages: number = 1) {
   // validate repo
   const repoRegex = /^[\w-]+\/[\w-]+$/
   if (!repoRegex.test(repo)) {
@@ -31,7 +31,7 @@ export async function fetchRepo(repo: string) {
   console.log(`fetching ${repo}`)
   const users = []
   let page = 1
-  while (true) {
+  while (page <= maxPages) {
     const res = await fetch(
       `https://api.github.com/repos/${repo}/contributors?per_page=100&page=${page}`
     )
@@ -59,11 +59,11 @@ export async function fetchRepo(repo: string) {
   return usersUse
 }
 
-export async function fetchRepos(repos: string[]) {
+export async function fetchRepos(repos: string[], maxPages?: number) {
   const users = (
     await Promise.all(
       repos.map(async (repo) => {
-        const users = await fetchRepo(repo)
+        const users = await fetchRepo(repo, maxPages)
         return users
       })
     )

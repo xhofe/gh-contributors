@@ -29,9 +29,9 @@ export function getUser(
 }
 
 export async function generateSVG(
-  conf: { repos: string[] } & Omit<calParamsArg, "total">
+  conf: { repos: string[]; maxPages?: number } & Omit<calParamsArg, "total">
 ) {
-  const users = (await fetchRepos(conf.repos)) as GhUser[]
+  const users = (await fetchRepos(conf.repos, conf.maxPages)) as GhUser[]
   const avatars = await Promise.all(
     users.map(async (user: GhUserUse) => await fetchAvatar(user.avatar_url))
   )

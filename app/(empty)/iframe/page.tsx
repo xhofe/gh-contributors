@@ -1,5 +1,4 @@
 "use client"
-import { fetchRepos } from "@/app/api/github"
 import { GhUserUse } from "@/app/api/types"
 import { calParams } from "@/utils/svg"
 import { Spinner } from "@nextui-org/react"
