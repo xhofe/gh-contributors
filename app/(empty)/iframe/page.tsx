@@ -2,6 +2,7 @@
 import { fetchRepos } from "@/app/api/github"
 import { GhUserUse } from "@/app/api/types"
 import { calParams } from "@/utils/svg"
+import { Spinner } from "@nextui-org/react"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -18,7 +19,11 @@ export default function Page() {
     fetchUsers()
   }, [])
   if (users.length === 0) {
-    return <div>loading...</div>
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <Spinner />
+      </div>
+    )
   }
   const params = calParams({
     cols: searchParams.get("cols"),
@@ -42,7 +47,7 @@ export default function Page() {
       width={params.totalWidth}
       height={params.totalHeight}
       viewBox={`0 0 ${params.totalWidth} ${params.totalHeight}`}
-      className="max-w-full"
+      className="max-w-full h-auto"
     >
       {usersGroup.map((users, i) =>
         users.map((user, j) => (
@@ -59,7 +64,7 @@ export default function Page() {
                   height={params.height}
                   x={params.x(j)}
                   y={params.y(i)}
-                  rx="32"
+                  rx={params.radius}
                 />
               </clipPath>
             </defs>
