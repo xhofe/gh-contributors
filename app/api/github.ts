@@ -6,6 +6,11 @@ const userCache = new LRUCache<string, GhUserUse[]>({
   ttl: 1000 * 60 * 60 * 24,
 })
 
+const userNotFoundCache = new LRUCache<string, boolean>({
+  max: 100,
+  ttl: 1000 * 60 * 60 * 12,
+})
+
 const avatarCache = new LRUCache<string, string>({
   max: 2000,
   ttl: 1000 * 60 * 60 * 24,
@@ -20,6 +25,9 @@ export async function fetchRepo(repo: string) {
   if (userCache.has(repo)) {
     return userCache.get(repo)!
   }
+  if (userNotFoundCache.has(repo)) {
+    throw new Error(`repo ${repo} not found`)
+  }
   console.log(`fetching ${repo}`)
   const users = []
   let page = 1
@@ -29,6 +37,10 @@ export async function fetchRepo(repo: string) {
     )
     const usersPage = await res.json()
     if (usersPage.message) {
+      if (usersPage.message === "Not Found") {
+        userNotFoundCache.set(repo, true)
+        throw new Error(`repo ${repo} not found`)
+      }
       throw new Error(`failed to fetch repo ${repo}: ${usersPage.message}`)
     }
     if (usersPage.length === 0) {
