@@ -2,7 +2,7 @@
 
 import { Button, Card, CardBody, Chip, Image, Input } from "@nextui-org/react"
 import copy from "copy-to-clipboard"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export function Builder() {
@@ -19,18 +19,18 @@ export function Builder() {
   const svg = useMemo(() => {
     return `/api?` + repos.map((repo) => `repo=${repo}`).join("&")
   }, [repos])
-  const [text, setText] = useState("")
+  const inputRef = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
   function add() {
+    const text = inputRef.current?.value
     if (!text || repos.includes(text)) return
+    inputRef.current!.value = ""
     setRepos([...repos, text])
-    setText("")
   }
   const inputDom = (
     <>
       <Input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        ref={inputRef}
         placeholder="Input your github repo as owner/repo"
         // variant="faded"
         // color="primary"
