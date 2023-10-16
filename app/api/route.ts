@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateSVG } from "./svg"
-import { calParams } from "@/utils/svg"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {

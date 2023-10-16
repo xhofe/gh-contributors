@@ -1,12 +1,13 @@
 import { LRUCache } from "lru-cache"
 import { GhUser, GhUserUse } from "./types"
+import { UsedRepoInfo } from "@/types"
 
-const userCache = new LRUCache<string, GhUserUse[]>({
+const repoCache = new LRUCache<string, GhUserUse[]>({
   max: 500,
   ttl: 1000 * 60 * 60 * 24,
 })
 
-const userNotFoundCache = new LRUCache<string, boolean>({
+const repoNotFoundCache = new LRUCache<string, boolean>({
   max: 100,
   ttl: 1000 * 60 * 60 * 12,
 })
@@ -16,16 +17,32 @@ const avatarCache = new LRUCache<string, string>({
   ttl: 1000 * 60 * 60 * 24,
 })
 
+export function usedBy(per_page: number, page: number) {
+  let all = [] as UsedRepoInfo[]
+  repoCache.forEach((value, key) => {
+    all.push({
+      name: key,
+      count: value.length,
+    })
+  })
+  all = all.sort((a, b) => b.count - a.count)
+  const res = all.slice((page - 1) * per_page, page * per_page)
+  return {
+    data: res,
+    total: all.length,
+  }
+}
+
 export async function fetchRepo(repo: string, maxPages: number = 1) {
   // validate repo
   const repoRegex = /^[\w-]+\/[\w-]+$/
   if (!repoRegex.test(repo)) {
     throw new Error(`invalid repo: ${repo}`)
   }
-  if (userCache.has(repo)) {
-    return userCache.get(repo)!
+  if (repoCache.has(repo)) {
+    return repoCache.get(repo)!
   }
-  if (userNotFoundCache.has(repo)) {
+  if (repoNotFoundCache.has(repo)) {
     throw new Error(`repo ${repo} not found`)
   }
   console.log(`fetching ${repo}`)
@@ -38,7 +55,7 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
     const usersPage = await res.json()
     if (usersPage.message) {
       if (usersPage.message === "Not Found") {
-        userNotFoundCache.set(repo, true)
+        repoNotFoundCache.set(repo, true)
         throw new Error(`repo ${repo} not found`)
       }
       throw new Error(`failed to fetch repo ${repo}: ${usersPage.message}`)
@@ -55,7 +72,7 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
       avatar_url: user.avatar_url,
     }
   })
-  userCache.set(repo, usersUse)
+  repoCache.set(repo, usersUse)
   return usersUse
 }
 
