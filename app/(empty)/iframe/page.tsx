@@ -1,23 +1,20 @@
 "use client"
 import { GhUserUse } from "@/app/api/types"
-import { calParams } from "@/utils"
-import { Spinner } from "@nextui-org/react"
+import { calParams, fetcher } from "@/utils"
+import { Card, CardBody, Spinner } from "@nextui-org/react"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
 import useSWR from "swr"
+import { Error } from "./err"
 
 export default function Page() {
   const searchParams = useSearchParams()
-  const { data, error, isLoading } = useSWR<GhUserUse[]>(
-    `/api/json?${searchParams.toString()}`
+  const { data, error, isLoading } = useSWR<GhUserUse[] & { error?: string }>(
+    `/api/json?${searchParams.toString()}`,
+    fetcher
   )
 
   if (error) {
-    return (
-      <div className="h-full w-full flex justify-center items-center">
-        <p className="text-red-500">Error: {error?.message}</p>
-      </div>
-    )
+    return <Error error={error.message} />
   }
 
   if (isLoading) {
@@ -27,6 +24,11 @@ export default function Page() {
       </div>
     )
   }
+
+  if (data?.error) {
+    return <Error error={data.error} />
+  }
+  console.log(isLoading, data, error)
   const users = data!
   const params = calParams({
     cols: searchParams.get("cols"),
