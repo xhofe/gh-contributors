@@ -40,9 +40,11 @@ export function Show() {
   }
   if (!data?.total) {
     return (
-      <Card>
+      <Card className="mt-10">
         <CardBody>
-          <p className="text-center text-xl">No Used</p>
+          <p className="flex justify-center items-center text-xl w-96 h-48">
+            No Used
+          </p>
         </CardBody>
       </Card>
     )
