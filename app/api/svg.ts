@@ -1,4 +1,4 @@
-import { calParams, calParamsArg, calParamsResult } from "@/utils/svg"
+import { calParams, calParamsArg, calParamsResult } from "@/utils"
 import { fetchAvatar, fetchRepos } from "./github"
 import { GhUser, GhUserUse } from "./types"
 

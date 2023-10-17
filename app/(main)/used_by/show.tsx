@@ -1,5 +1,6 @@
 "use client"
 import { UsedRepoInfo } from "@/types"
+import { fetcher } from "@/utils"
 import {
   Card,
   CardBody,
@@ -12,14 +13,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import useSWR from "swr"
 
-function fetcher(
-  input: Parameters<typeof fetch>[0],
-  init?: Parameters<typeof fetch>[1]
-) {
-  return fetch(input, init).then((res) => res.json())
-}
-
-const host = "https://api.nn.ci/proxy/contrib.nn.ci"
+const host = ""
 
 export function Show() {
   const searchParams = useSearchParams()
@@ -33,7 +27,7 @@ export function Show() {
   if (error) {
     return (
       <div className="w-full h-24 flex justify-center items-center">
-        <p className="text-red-500">Error: {error.message}</p>
+        <p className="text-red-500">Error: {error?.message}</p>
       </div>
     )
   }

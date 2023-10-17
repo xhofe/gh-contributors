@@ -1,36 +1,40 @@
 "use client"
 import { GhUserUse } from "@/app/api/types"
-import { calParams } from "@/utils/svg"
+import { calParams } from "@/utils"
 import { Spinner } from "@nextui-org/react"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import useSWR from "swr"
 
 export default function Page() {
   const searchParams = useSearchParams()
-  const [users, setUsers] = useState<GhUserUse[]>([])
-  async function fetchUsers() {
-    try {
-      const resp = await fetch("/api/json?" + searchParams.toString())
-      setUsers(await resp.json())
-    } catch (e) {}
+  const { data, error, isLoading } = useSWR<GhUserUse[]>(
+    `/api/json?${searchParams.toString()}`
+  )
+
+  if (error) {
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <p className="text-red-500">Error: {error?.message}</p>
+      </div>
+    )
   }
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-  if (users.length === 0) {
+
+  if (isLoading) {
     return (
       <div className="h-full w-full flex justify-center items-center">
         <Spinner />
       </div>
     )
   }
+  const users = data!
   const params = calParams({
     cols: searchParams.get("cols"),
     radius: searchParams.get("radius"),
     space: searchParams.get("space"),
     total: users.length,
   })
-  const usersGroup = users.reduce((acc, user) => {
+  const usersGroup = users!.reduce((acc, user) => {
     const index = acc.findIndex((group) => group.length < params.cols)
     if (index === -1) {
       acc.push([user])
