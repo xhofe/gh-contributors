@@ -12,7 +12,7 @@ const foot = `\n</svg>`
 export function getUser(
   row: number,
   col: number,
-  user: GhUser,
+  user: GhUserUse,
   avatar: string,
   params: calParamsResult
 ) {
@@ -37,11 +37,11 @@ export async function generateSVG(
   )
   const params = calParams({ ...conf, users: users })
   let svg = getHead(params)
-  for (let i = 0; i < users.length; i++) {
+  for (let i = 0; i < params.total; i++) {
     svg += getUser(
       Math.floor(i / params.cols),
       i % params.cols,
-      users[i],
+      params.users[i],
       avatars[i],
       params
     )

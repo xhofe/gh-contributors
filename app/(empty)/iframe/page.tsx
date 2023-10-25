@@ -1,7 +1,7 @@
 "use client"
 import { GhUserUse } from "@/app/api/types"
 import { calParams, fetcher } from "@/utils"
-import { Card, CardBody, Spinner } from "@nextui-org/react"
+import { Spinner } from "@nextui-org/react"
 import { useSearchParams } from "next/navigation"
 import useSWR from "swr"
 import { Error } from "./err"
@@ -36,7 +36,7 @@ export default function Page() {
     space: searchParams.get("space"),
     users: users,
   })
-  const usersGroup = users!.reduce((acc, user) => {
+  const usersGroup = params.users.reduce((acc, user) => {
     const index = acc.findIndex((group) => group.length < params.cols)
     if (index === -1) {
       acc.push([user])

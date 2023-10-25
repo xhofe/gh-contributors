@@ -13,13 +13,14 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import useSWR from "swr"
 
+// const host = "https://api.nn.ci/proxy/https://contrib.nn.ci"
 const host = ""
 
 export function Show() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
-  const perPage = 24
+  const perPage = parseInt(searchParams.get("per_page") || "24")
   const { data, error, isLoading } = useSWR<{
     data: UsedRepoInfo[]
     total: number
@@ -55,9 +56,13 @@ export function Show() {
       <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
         {data!.data.map((repo) => (
           <Card isPressable key={repo.name}>
-            <CardHeader className="pb-0">{repo.name}</CardHeader>
+            <CardHeader className="pb-0">
+              <Link href={`https://github.com/${repo.name}`} isExternal className=" hover:underline">
+                {repo.name}
+              </Link>
+            </CardHeader>
             <CardBody className="p-3">
-              <Link href={`/api?repo=${repo.name}`}>
+              <Link isExternal href={`/api?repo=${repo.name}`}>
                 <Image src={`${host}/api?repo=${repo.name}`} />
               </Link>
             </CardBody>

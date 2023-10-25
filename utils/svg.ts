@@ -31,6 +31,7 @@ export function calParams(conf: {
   function y(i: number) {
     return space + i * (radius * 2 + space)
   }
+  const users = conf.users
   return {
     cols,
     radius,
@@ -43,6 +44,7 @@ export function calParams(conf: {
     x,
     y,
     total,
+    users,
   }
 }
 
