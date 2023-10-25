@@ -20,7 +20,7 @@ export function Show() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
-  const perPage = parseInt(searchParams.get("per_page") || "24")
+  const perPage = parseInt(searchParams.get("per_page") || "12")
   const { data, error, isLoading } = useSWR<{
     data: UsedRepoInfo[]
     total: number
