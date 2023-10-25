@@ -70,6 +70,7 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
     return {
       login: user.login,
       avatar_url: user.avatar_url,
+      type: user.type,
     }
   })
   repoCache.set(repo, usersUse)

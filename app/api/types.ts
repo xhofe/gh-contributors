@@ -15,10 +15,10 @@ export type GhUser = {
   repos_url: string
   events_url: string
   received_events_url: string
-  type: string
+  type: "User" | "Bot"
   site_admin: boolean
   contributions: number
-  avatar_base64?: string
+  // avatar_base64?: string
 }
 
-export type GhUserUse = Pick<GhUser, "login" | "avatar_url">
+export type GhUserUse = Pick<GhUser, "login" | "avatar_url" | "type">

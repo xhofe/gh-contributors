@@ -1,3 +1,5 @@
+import { GhUserUse } from "@/app/api/types"
+
 function getVal(val: number | string | null | undefined, defaultValue: number) {
   let result = defaultValue
   if (val) {
@@ -12,14 +14,15 @@ function getVal(val: number | string | null | undefined, defaultValue: number) {
 
 export function calParams(conf: {
   cols?: number | null | string
-  total: number
+  users: GhUserUse[]
   radius?: number | null | string
   space?: number | null | string
 }) {
   const cols = getVal(conf.cols, 12)
   const radius = getVal(conf.radius, 32)
   const space = getVal(conf.space, 5)
-  const rows = Math.ceil(conf.total / cols)
+  const total = conf.users.length
+  const rows = Math.ceil(total / cols)
   const totalWidth = space + cols * (radius * 2 + space)
   const totalHeight = space + rows * (radius * 2 + space)
   function x(j: number) {
@@ -39,6 +42,7 @@ export function calParams(conf: {
     height: radius * 2,
     x,
     y,
+    total,
   }
 }
 
