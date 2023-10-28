@@ -35,6 +35,8 @@ export default function Page() {
     radius: searchParams.get("radius"),
     space: searchParams.get("space"),
     users: users,
+    no_bot: searchParams.getAll("no_bot").length > 0,
+    min_contributions: searchParams.get("min_contributions"),
   })
   const usersGroup = params.users.reduce((acc, user) => {
     const index = acc.findIndex((group) => group.length < params.cols)

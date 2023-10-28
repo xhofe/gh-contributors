@@ -21,4 +21,7 @@ export type GhUser = {
   // avatar_base64?: string
 }
 
-export type GhUserUse = Pick<GhUser, "login" | "avatar_url" | "type">
+export type GhUserUse = Pick<
+  GhUser,
+  "login" | "avatar_url" | "type" | "contributions"
+>

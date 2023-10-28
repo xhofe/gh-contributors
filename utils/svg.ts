@@ -17,11 +17,21 @@ export function calParams(conf: {
   users: GhUserUse[]
   radius?: number | null | string
   space?: number | null | string
+  no_bot?: boolean
+  min_contributions?: number | null | string
 }) {
+  let users = conf.users
+  if (conf.no_bot) {
+    users = users.filter((user) => user.type !== "Bot")
+  }
+  if (conf.min_contributions) {
+    const min_contributions = getVal(conf.min_contributions, 0)
+    users = users.filter((user) => user.contributions >= min_contributions)
+  }
   const cols = getVal(conf.cols, 12)
   const radius = getVal(conf.radius, 32)
   const space = getVal(conf.space, 5)
-  const total = conf.users.length
+  const total = users.length
   const rows = Math.ceil(total / cols)
   const totalWidth = space + cols * (radius * 2 + space)
   const totalHeight = space + rows * (radius * 2 + space)
@@ -31,7 +41,7 @@ export function calParams(conf: {
   function y(i: number) {
     return space + i * (radius * 2 + space)
   }
-  const users = conf.users
+
   return {
     cols,
     radius,

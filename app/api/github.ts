@@ -106,11 +106,12 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
     users.push(...usersPage)
     page++
   }
-  const usersUse = (users as GhUser[]).map((user) => {
+  const usersUse = (users as GhUser[]).map((user): GhUserUse => {
     return {
       login: user.login,
       avatar_url: user.avatar_url,
       type: user.type,
+      contributions: user.contributions,
     }
   })
   repoCache.set(repo, usersUse)

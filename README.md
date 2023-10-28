@@ -12,8 +12,13 @@ Or generate online with [gh-contributors](https://contrib.nn.ci/)
 
 The following parameters are available:
 
-- repo: The repository to generate the svg for, e.g. `Xhofe/gh-contributors`, required & multiple;
+- repo: The repository to generate the svg for, e.g. `xhofe/gh-contributors`, required & multiple;
 - cols: Number of avatars per row (default: 12)
+- pages: Number of pages to generate per repo (default: 1), 100 contributors per page
+- radius: The radius of the avatars (default: 32)
+- space: The spacing between avatars (default: 5)
+- no_bot: Do not show bots (default: false)
+- min_contributions: Only show contributors with at least this number of contributions (default: 0)
 
 ## Example
 

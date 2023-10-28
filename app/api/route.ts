@@ -16,6 +16,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       cols: searchParams.get("cols"),
       radius: searchParams.get("radius"),
       space: searchParams.get("space"),
+      no_bot: searchParams.getAll("no_bot").length > 0,
+      min_contributions: searchParams.get("min_contributions"),
     })
     return new NextResponse(svg, {
       headers: {
