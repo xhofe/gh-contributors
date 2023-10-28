@@ -1,5 +1,4 @@
 import { GhUserUse } from "@/app/api/types"
-import sharp from "sharp"
 
 function getVal(val: number | string | null | undefined, defaultValue: number) {
   let result = defaultValue
@@ -44,12 +43,6 @@ export function calParams(conf: {
     return space + i * (radius * 2 + space)
   }
   const compressSize = getVal(conf.compress, radius * 4)
-  function compress(img: Buffer) {
-    if (!compressSize) {
-      return img
-    }
-    return sharp(img).resize(compressSize, compressSize).toBuffer()
-  }
   return {
     cols,
     radius,
@@ -63,7 +56,7 @@ export function calParams(conf: {
     y,
     total,
     users,
-    compress,
+    compressSize,
   }
 }
 

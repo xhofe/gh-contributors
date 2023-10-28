@@ -1,6 +1,7 @@
 import { calParams, calParamsArg, calParamsResult } from "@/utils"
 import { fetchAvatar, fetchRepos } from "./github"
 import { GhUser, GhUserUse } from "./types"
+import sharp from "sharp"
 
 export function getHead(params: calParamsResult) {
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${params.totalWidth}" height="${params.totalHeight}">
@@ -33,10 +34,18 @@ export async function generateSVG(
 ) {
   const users = (await fetchRepos(conf.repos, conf.maxPages)) as GhUser[]
   const params = calParams({ ...conf, users: users })
+  function compress(img: Buffer) {
+    if (!params.compressSize) {
+      return img
+    }
+    return sharp(img)
+      .resize(params.compressSize, params.compressSize)
+      .toBuffer()
+  }
   const avatars = await Promise.all(
     params.users.map(async (user: GhUserUse) => {
       const buf = await fetchAvatar(user.avatar_url)
-      const compressed = await params.compress(buf)
+      const compressed = await compress(buf)
       return compressed.toString("base64")
     })
   )
