@@ -37,6 +37,7 @@ export default function Page() {
     users: users,
     no_bot: searchParams.getAll("no_bot").length > 0,
     min_contributions: searchParams.get("min_contributions"),
+    compress: searchParams.get("compress"),
   })
   const usersGroup = params.users.reduce((acc, user) => {
     const index = acc.findIndex((group) => group.length < params.cols)

@@ -32,10 +32,14 @@ export async function generateSVG(
   conf: { repos: string[]; maxPages?: number } & Omit<calParamsArg, "users">
 ) {
   const users = (await fetchRepos(conf.repos, conf.maxPages)) as GhUser[]
-  const avatars = await Promise.all(
-    users.map(async (user: GhUserUse) => await fetchAvatar(user.avatar_url))
-  )
   const params = calParams({ ...conf, users: users })
+  const avatars = await Promise.all(
+    params.users.map(async (user: GhUserUse) => {
+      const buf = await fetchAvatar(user.avatar_url)
+      const compressed = await params.compress(buf)
+      return compressed.toString("base64")
+    })
+  )
   let svg = getHead(params)
   for (let i = 0; i < params.total; i++) {
     svg += getUser(

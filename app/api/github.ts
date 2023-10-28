@@ -43,7 +43,7 @@ const repoNotFoundCache = new LRUCache<string, boolean>({
   ttl: 1000 * 60 * 60 * 12,
 })
 
-const avatarCache = new LRUCache<string, string>({
+const avatarCache = new LRUCache<string, Buffer>({
   max: 2000,
   ttl: 1000 * 60 * 60 * 24,
 })
@@ -136,14 +136,11 @@ export async function fetchRepos(repos: string[], maxPages?: number) {
 }
 
 export async function fetchAvatar(url: string) {
-  if (!url.startsWith("http")) {
-    return url
-  }
   if (avatarCache.has(url)) {
     return avatarCache.get(url)!
   }
   const response = await fetch(url)
-  const res = Buffer.from(await response.arrayBuffer()).toString("base64")
+  const res = Buffer.from(await response.arrayBuffer())
   avatarCache.set(url, res)
   return res
 }

@@ -19,6 +19,7 @@ The following parameters are available:
 - space: The spacing between avatars (default: 5)
 - no_bot: Do not show bots (default: false)
 - min_contributions: Only show contributors with at least this number of contributions (default: 0)
+- compress: The height/width of each avatar after compression (default: radius \* 4, 0 to disable)
 
 ## Example
 
