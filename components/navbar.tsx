@@ -22,7 +22,7 @@ export const Navbar = () => {
       <NavbarContent className="flex basis-full" justify="center">
         <NavbarItem className="flex gap-2 items-center">
           <NextLink href="/">
-            <SolarHomeSmileAngleBold className="text-2xl opacity-60" />
+            <SolarHomeSmileAngleBold className="text-2xl transition-opacity opacity-60 hover:opacity-50" />
           </NextLink>
           <Link isExternal href={siteConfig.links.github} aria-label="Github">
             <GithubIcon className="text-default-500" />
