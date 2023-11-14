@@ -78,6 +78,7 @@ export function usedBy(per_page: number, page: number) {
   const res = repos.slice((page - 1) * per_page, page * per_page)
   return {
     data: res,
+    total: repos.length,
   }
 }
 

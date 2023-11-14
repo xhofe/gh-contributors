@@ -1,5 +1,4 @@
 "use client"
-import { UsedRepoInfo } from "@/types"
 import { fetcher } from "@/utils"
 import {
   Card,
@@ -22,7 +21,7 @@ export function Show() {
   const router = useRouter()
   const perPage = parseInt(searchParams.get("per_page") || "12")
   const { data, error, isLoading } = useSWR<{
-    data: UsedRepoInfo[]
+    data: string[]
     total: number
   }>(`${host}/api/used_by?` + searchParams.toString(), fetcher)
   if (error) {
@@ -55,15 +54,19 @@ export function Show() {
     <div className="w-full pt-4 md:px-10 lg:px-[14%] flex gap-2 flex-col">
       <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
         {data!.data.map((repo) => (
-          <Card isPressable key={repo.name}>
+          <Card isPressable key={repo}>
             <CardHeader className="pb-0">
-              <Link href={`https://github.com/${repo.name}`} isExternal className=" hover:underline">
-                {repo.name}
+              <Link
+                href={`https://github.com/${repo}`}
+                isExternal
+                className=" hover:underline"
+              >
+                {repo}
               </Link>
             </CardHeader>
             <CardBody className="p-3">
-              <Link isExternal href={`/api?repo=${repo.name}`}>
-                <Image src={`${host}/api?repo=${repo.name}`} />
+              <Link isExternal href={`/api?repo=${repo}`}>
+                <Image src={`${host}/api?repo=${repo}`} />
               </Link>
             </CardBody>
           </Card>
