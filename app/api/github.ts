@@ -58,7 +58,7 @@ const throttleSaveRepoExists = throttle(() => {
   saveByPath(repoExists, repo_exists_file_path)
 }, 1000 * 60)
 
-const repoExists = new LRUCache<string, boolean>({
+const repoExists = new LRUCache<string, number>({
   max: 100,
   ttl: 1000 * 60 * 60 * 12,
 })
@@ -69,10 +69,13 @@ const avatarCache = new LRUCache<string, Buffer>({
 })
 
 export function usedBy(per_page: number, page: number) {
-  let repos = [] as string[]
+  let repos = [] as { name: string; pages: number }[]
   repoExists.forEach((value, key) => {
     if (value) {
-      repos.push(key)
+      repos.push({
+        name: key,
+        pages: value,
+      })
     }
   })
   const res = repos.slice((page - 1) * per_page, page * per_page)
@@ -103,7 +106,7 @@ async function fetchRepoOnePage(repo: string, page: number) {
   const usersPage = await res.json()
   if (usersPage.message) {
     if (usersPage.message === "Not Found") {
-      repoExists.set(repo, false)
+      repoExists.set(repo, 0)
       throw new Error(`repo ${repo} not found`)
     }
     throw new Error(`failed to fetch repo ${cacheKey}: ${usersPage.message}`)
@@ -118,7 +121,7 @@ async function fetchRepoOnePage(repo: string, page: number) {
   })
   repoCache.set(cacheKey, usersUse)
   throttleSaveRepoCache()
-  repoExists.set(repo, true)
+  repoExists.set(repo, page)
   throttleSaveRepoExists()
   return usersUse
 }
@@ -129,7 +132,7 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
   if (!repoRegex.test(repo)) {
     throw new Error(`invalid repo: ${repo}`)
   }
-  if (repoExists.get(repo) === false) {
+  if (repoExists.get(repo) === 0) {
     throw new Error(`repo ${repo} not found`)
   }
   console.log(`fetching ${repo}`)

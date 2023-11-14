@@ -21,7 +21,10 @@ export function Show() {
   const router = useRouter()
   const perPage = parseInt(searchParams.get("per_page") || "12")
   const { data, error, isLoading } = useSWR<{
-    data: string[]
+    data: {
+      name: string
+      pages: number
+    }[]
     total: number
   }>(`${host}/api/used_by?` + searchParams.toString(), fetcher)
   if (error) {
@@ -54,19 +57,24 @@ export function Show() {
     <div className="w-full pt-4 md:px-10 lg:px-[14%] flex gap-2 flex-col">
       <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
         {data!.data.map((repo) => (
-          <Card isPressable key={repo}>
+          <Card isPressable key={repo.name}>
             <CardHeader className="pb-0">
               <Link
-                href={`https://github.com/${repo}`}
+                href={`https://github.com/${repo.name}`}
                 isExternal
                 className=" hover:underline"
               >
-                {repo}
+                {repo.name}
               </Link>
             </CardHeader>
             <CardBody className="p-3">
-              <Link isExternal href={`/api?repo=${repo}`}>
-                <Image src={`${host}/api?repo=${repo}`} />
+              <Link
+                isExternal
+                href={`/api?repo=${repo.name}&pages=${repo.pages}`}
+              >
+                <Image
+                  src={`${host}/api?repo=${repo.name}&pages=${repo.pages}`}
+                />
               </Link>
             </CardBody>
           </Card>
