@@ -140,6 +140,9 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
   let page = 1
   while (page <= maxPages) {
     const usersPage = await fetchRepoOnePage(repo, page)
+    if (usersPage.length === 0) {
+      break
+    }
     users.push(...usersPage)
     page++
   }
