@@ -60,7 +60,12 @@ const throttleSaveRepoExists = throttle(() => {
 
 const repoExists = new LRUCache<string, number>({
   max: 100,
-  ttl: 1000 * 60 * 60 * 12,
+  ttl: 1000 * 60 * 60 * 24 * 10,
+})
+
+const repoNotExists = new LRUCache<string, boolean>({
+  max: 100,
+  ttl: 1000 * 60 * 60 * 24 * 10,
 })
 
 const avatarCache = new LRUCache<string, Buffer>({
@@ -106,7 +111,7 @@ async function fetchRepoOnePage(repo: string, page: number) {
   const usersPage = await res.json()
   if (usersPage.message) {
     if (usersPage.message === "Not Found") {
-      repoExists.set(repo, 0)
+      repoNotExists.set(repo, true)
       throw new Error(`repo ${repo} not found`)
     }
     throw new Error(`failed to fetch repo ${cacheKey}: ${usersPage.message}`)
@@ -132,7 +137,7 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
   if (!repoRegex.test(repo)) {
     throw new Error(`invalid repo: ${repo}`)
   }
-  if (repoExists.get(repo) === 0) {
+  if (repoNotExists.get(repo)) {
     throw new Error(`repo ${repo} not found`)
   }
   console.log(`fetching ${repo}`)
