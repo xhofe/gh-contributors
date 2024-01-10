@@ -55,9 +55,9 @@ export function Show() {
   const pages = Math.ceil(data.total / perPage)
   return (
     <div className="w-full pt-4 md:px-10 lg:px-[14%] flex gap-2 flex-col">
-      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-4">
+      <div className="columns-[344px]">
         {data!.data.map((repo) => (
-          <Card isPressable key={repo.name}>
+          <Card isPressable key={repo.name} className="mb-4 w-full">
             <CardHeader className="pb-0">
               <Link
                 href={`https://github.com/${repo.name}`}
