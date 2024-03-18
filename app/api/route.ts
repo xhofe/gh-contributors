@@ -24,6 +24,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       headers: {
         "Content-Type": "image/svg+xml",
         "Cache-Control": "public, max-age=86400",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
       },
     })
   } catch (e: any) {
@@ -40,6 +42,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         headers: {
           "Content-Type": "image/svg+xml",
           "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
         },
       }
     )
