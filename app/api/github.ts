@@ -2,7 +2,7 @@ import { LRUCache } from "lru-cache"
 import { GhUser, GhUserUse } from "./types"
 import fs from "node:fs/promises"
 import path from "node:path"
-import { throttle } from "@/utils"
+import { throttle, Singleflight } from "@/utils"
 
 const repoCache = new LRUCache<string, GhUserUse[]>({
   max: 500,
@@ -90,6 +90,9 @@ export function usedBy(per_page: number, page: number) {
   }
 }
 
+const repoSF = new Singleflight()
+const avatarSF = new Singleflight()
+
 async function fetchRepoOnePage(repo: string, page: number) {
   const cacheKey = `${repo}-${page}`
   if (repoCache.has(cacheKey)) {
@@ -158,7 +161,7 @@ export async function fetchRepos(repos: string[], maxPages?: number) {
   const users = (
     await Promise.all(
       repos.map(async (repo) => {
-        const users = await fetchRepo(repo, maxPages)
+        const users = await repoSF.do(repo, () => fetchRepo(repo, maxPages))
         return users
       })
     )
@@ -174,7 +177,7 @@ export async function fetchAvatar(url: string) {
   if (avatarCache.has(url)) {
     return avatarCache.get(url)!
   }
-  const response = await fetch(url)
+  const response = await avatarSF.do(url, () => fetch(url))
   const res = Buffer.from(await response.arrayBuffer())
   avatarCache.set(url, res)
   return res
