@@ -2,7 +2,7 @@ import { LRUCache } from "lru-cache"
 import { GhUser, GhUserUse } from "./types"
 import fs from "node:fs/promises"
 import path from "node:path"
-import { throttle, Singleflight } from "@/utils"
+import { throttle, Singleflight, log } from "@/utils"
 
 const repoCache = new LRUCache<string, GhUserUse[]>({
   max: 500,
@@ -19,9 +19,9 @@ async function loadByPath<K extends {}, V extends {}>(
   try {
     const items = JSON.parse(await fs.readFile(filePath, "utf-8"))
     cache.load(items)
-    console.log(`--- ${filePath} cache loaded ---`)
+    log(`--- ${filePath} cache loaded ---`)
   } catch (e) {
-    console.log(`--- ${filePath} no cache found ---`, e)
+    log(`--- ${filePath} no cache found ---`, e)
   }
 }
 
@@ -30,23 +30,23 @@ async function saveByPath<K extends {}, V extends {}>(
   filePath: string
 ) {
   try {
-    console.log(`--- ${filePath} saving cache ---`)
+    log(`--- ${filePath} saving cache ---`)
     const items = cache.dump()
     await fs.writeFile(filePath, JSON.stringify(items))
-    console.log(`--- ${filePath} cache saved ---`)
+    log(`--- ${filePath} cache saved ---`)
   } catch (e) {
-    console.log(`--- ${filePath} failed to save cache ---`, e)
+    log(`--- ${filePath} failed to save cache ---`, e)
   }
 }
 
 async function loadCache() {
-  console.log(`--- PAT: ${process.env.PAT} ---`)
+  log(`--- PAT: ${process.env.PAT} ---`)
   try {
     await fs.mkdir(path.dirname(repo_cache_file_path), { recursive: true })
     loadByPath(repoCache, repo_cache_file_path)
     loadByPath(repoExists, repo_exists_file_path)
   } catch (e) {
-    console.log(e)
+    log(e)
   }
 }
 
@@ -98,7 +98,7 @@ async function fetchRepoOnePage(repo: string, page: number) {
   if (repoCache.has(cacheKey)) {
     return repoCache.get(cacheKey)!
   }
-  console.log(`fetching ${cacheKey}`)
+  log(`fetching repo:${repo} page:${page}`)
   let fetchInit: Parameters<typeof fetch>[1]
   if (process.env.PAT) {
     fetchInit = {
@@ -143,7 +143,6 @@ export async function fetchRepo(repo: string, maxPages: number = 1) {
   if (repoNotExists.get(repo)) {
     throw new Error(`repo ${repo} not found`)
   }
-  console.log(`fetching ${repo}`)
   const users = [] as GhUserUse[]
   let page = 1
   while (page <= maxPages) {
