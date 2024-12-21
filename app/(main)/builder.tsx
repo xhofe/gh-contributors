@@ -1,9 +1,65 @@
 "use client"
 
-import { Button, Card, CardBody, Chip, Image, Input } from "@nextui-org/react"
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Image,
+  Input,
+  Tooltip,
+} from "@nextui-org/react"
 import copy from "copy-to-clipboard"
 import { useState, useMemo, useRef } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import IframePage from "@/app/(empty)/iframe/page"
+
+const options = [
+  {
+    name: "cols",
+    type: "number",
+    default: "12",
+    desc: "Number of avatars per row (default: 12)",
+  },
+  {
+    name: "pages",
+    type: "number",
+    default: "1",
+    desc: "Number of pages to generate per repo (default: 1), 100 contributors per page",
+  },
+  {
+    name: "radius",
+    type: "number",
+    default: "32",
+    desc: "The radius of the avatars (default: 32)",
+  },
+  {
+    name: "space",
+    type: "number",
+    default: "5",
+    desc: "The spacing between avatars (default: 5)",
+  },
+  {
+    name: "min_contributions",
+    type: "number",
+    default: "0",
+    desc: "Only show contributors with at least this number of contributions (default: 0)",
+  },
+  {
+    name: "compress",
+    type: "number",
+    default: "",
+    desc: "The height/width of each avatar after compression (default: radius * 4, 0 to disable)",
+  },
+  {
+    name: "no_bot",
+    type: "boolean",
+    default: false,
+    desc: "Do not show bots (default: false)",
+  },
+]
 
 export function Builder() {
   const searchParams = useSearchParams()
@@ -12,12 +68,20 @@ export function Builder() {
   const repos = searchParams.getAll("repo")
   function setRepos(_repos: string[]) {
     const params = new URLSearchParams()
+    searchParams.forEach((value, key) => {
+      if (key !== "repo") {
+        params.append(key, value)
+      }
+    })
     _repos.forEach((repo) => params.append("repo", repo))
     router.replace(`${pathname}?${params.toString()}`)
   }
-  // const [repos, setRepos] = useState<string[]>([])
   const svg = useMemo(() => {
-    return `/api?` + repos.map((repo) => `repo=${repo}`).join("&")
+    const params = [] as string[]
+    searchParams.forEach((value, key) => {
+      params.push(`${key}=${value}`)
+    })
+    return `${location.origin}/api?` + params.join("&")
   }, [repos])
   const inputRef = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
@@ -26,6 +90,18 @@ export function Builder() {
     if (!text || repos.includes(text)) return
     inputRef.current!.value = ""
     setRepos([...repos, text])
+  }
+  function setOption(key: string, value?: string) {
+    const params = new URLSearchParams()
+    searchParams.forEach((value, key) => {
+      params.append(key, value)
+    })
+    if (!value) {
+      params.delete(key)
+    } else {
+      params.set(key, value)
+    }
+    router.replace(`${pathname}?${params.toString()}`)
   }
   const inputDom = (
     <>
@@ -65,6 +141,60 @@ export function Builder() {
           </Chip>
         ))}
       </div>
+      <Accordion>
+        <AccordionItem
+          title="Advanced Options"
+          classNames={{
+            trigger: "py-0",
+          }}
+        >
+          <div className="flex gap-2 flex-wrap items-center font-mono w-full">
+            {options.map((option) => {
+              if (["number", "string"].includes(option.type)) {
+                return (
+                  <Input
+                    key={option.name}
+                    label={option.name}
+                    placeholder={option.desc}
+                    value={searchParams.get(option.name) || ""}
+                    onChange={(e) => {
+                      const value = e.target.value.trim()
+                      setOption(
+                        option.name,
+                        !value || value === option.default ? undefined : value
+                      )
+                    }}
+                    size="sm"
+                  />
+                )
+              } else if (option.type === "boolean") {
+                return (
+                  <Tooltip content={option.desc} key={option.name}>
+                    <Button
+                      size="sm"
+                      color={
+                        searchParams.get(option.name) === "true"
+                          ? "primary"
+                          : "default"
+                      }
+                      onPress={() => {
+                        setOption(
+                          option.name,
+                          searchParams.get(option.name) === "true"
+                            ? undefined
+                            : "true"
+                        )
+                      }}
+                    >
+                      {option.name}
+                    </Button>
+                  </Tooltip>
+                )
+              }
+            })}
+          </div>
+        </AccordionItem>
+      </Accordion>
     </>
   )
   return (
@@ -75,17 +205,14 @@ export function Builder() {
       <div className="flex sm:hidden flex-col gap-3">{inputDom}</div>
       {repos.length > 0 && (
         <>
-          <Image width="100%" src={svg} alt="svg" />
+          <IframePage />
           <Card>
             <CardBody>
               <div className="flex font-mono justify-between items-center break-all">
-                <p>
-                  {location.origin}
-                  {svg}
-                </p>
+                <p>{svg}</p>
                 <Button
                   onClick={() => {
-                    copy(`${location.origin}${svg}`)
+                    copy(svg)
                     setCopied(true)
                     setTimeout(() => {
                       setCopied(false)
