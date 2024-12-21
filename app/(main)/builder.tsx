@@ -205,7 +205,9 @@ export function Builder() {
       <div className="flex sm:hidden flex-col gap-3">{inputDom}</div>
       {repos.length > 0 && (
         <>
-          <IframePage />
+          <div className="flex justify-center">
+            <IframePage />
+          </div>
           <Card>
             <CardBody>
               <div className="flex font-mono justify-between items-center break-all">
