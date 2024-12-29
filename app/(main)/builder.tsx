@@ -74,7 +74,7 @@ export function Builder() {
       }
     })
     _repos.forEach((repo) => params.append("repo", repo))
-    router.replace(`${pathname}?${params.toString()}`)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }
   const svg = useMemo(() => {
     const params = [] as string[]
@@ -101,7 +101,7 @@ export function Builder() {
     } else {
       params.set(key, value)
     }
-    router.replace(`${pathname}?${params.toString()}`)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }
   const inputDom = (
     <>
