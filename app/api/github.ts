@@ -94,44 +94,49 @@ const repoSF = new Singleflight()
 const avatarSF = new Singleflight()
 
 async function fetchRepoOnePage(repo: string, page: number) {
-  const cacheKey = `${repo}-${page}`
-  if (repoCache.has(cacheKey)) {
-    return repoCache.get(cacheKey)!
-  }
-  log(`fetching repo:${repo} page:${page}`)
-  let fetchInit: Parameters<typeof fetch>[1]
-  if (process.env.PAT) {
-    fetchInit = {
-      headers: {
-        Authorization: `Bearer ${process.env.PAT}`,
-      },
+  try {
+    const cacheKey = `${repo}-${page}`
+    if (repoCache.has(cacheKey)) {
+      return repoCache.get(cacheKey)!
     }
-  }
-  const res = await fetch(
-    `https://api.github.com/repos/${repo}/contributors?per_page=100&page=${page}`,
-    fetchInit
-  )
-  const usersPage = await res.json()
-  if (usersPage.message) {
-    if (usersPage.message === "Not Found") {
-      repoNotExists.set(repo, true)
-      throw new Error(`repo ${repo} not found`)
+    log(`fetching repo:${repo} page:${page}`)
+    let fetchInit: Parameters<typeof fetch>[1]
+    if (process.env.PAT) {
+      fetchInit = {
+        headers: {
+          Authorization: `Bearer ${process.env.PAT}`,
+        },
+      }
     }
-    throw new Error(`failed to fetch repo ${cacheKey}: ${usersPage.message}`)
-  }
-  const usersUse = (usersPage as GhUser[]).map((user): GhUserUse => {
-    return {
-      login: user.login,
-      avatar_url: user.avatar_url,
-      type: user.type,
-      contributions: user.contributions,
+    const res = await fetch(
+      `https://api.github.com/repos/${repo}/contributors?per_page=100&page=${page}`,
+      fetchInit
+    )
+    const usersPage = await res.json()
+    if (usersPage.message) {
+      if (usersPage.message === "Not Found") {
+        repoNotExists.set(repo, true)
+        throw new Error(`repo ${repo} not found`)
+      }
+      throw new Error(`failed to fetch repo ${cacheKey}: ${usersPage.message}`)
     }
-  })
-  repoCache.set(cacheKey, usersUse)
-  throttleSaveRepoCache()
-  repoExists.set(repo, page)
-  throttleSaveRepoExists()
-  return usersUse
+    const usersUse = (usersPage as GhUser[]).map((user): GhUserUse => {
+      return {
+        login: user.login,
+        avatar_url: user.avatar_url,
+        type: user.type,
+        contributions: user.contributions,
+      }
+    })
+    repoCache.set(cacheKey, usersUse)
+    throttleSaveRepoCache()
+    repoExists.set(repo, page)
+    throttleSaveRepoExists()
+    return usersUse
+  }catch(e){
+    console.error(`fetchRepoOnePage repo:${repo} page:${page} error:${e}`)
+    throw e
+  }
 }
 
 export async function fetchRepo(repo: string, maxPages: number = 1) {
