@@ -112,6 +112,15 @@ async function fetchRepoOnePage(repo: string, page: number) {
       `https://api.github.com/repos/${repo}/contributors?per_page=100&page=${page}`,
       fetchInit
     )
+    if (res.status >= 400) {
+      // if status code >= 400, throw error
+      throw new Error(`failed to fetch repo [${repo}]: ${res.status}`)
+    }
+    if (res.status !== 200) {
+      // if status code is not 200, return empty array
+      // because github will return 204 if repo is empty
+      return []
+    }
     const usersPage = await res.json()
     if (usersPage.message) {
       if (usersPage.message === "Not Found") {
