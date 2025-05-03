@@ -29,6 +29,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e: any) {
+    console.error(e)
     return new NextResponse(
       `<svg xmlns="http://www.w3.org/2000/svg">
     <foreignObject width="400" height="400">
