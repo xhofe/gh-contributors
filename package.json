@@ -16,7 +16,7 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
-    "clsx": "^2.0.0",
+    "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
