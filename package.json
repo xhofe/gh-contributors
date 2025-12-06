@@ -21,7 +21,7 @@
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "framer-motion": "^10.16.2",
-    "intl-messageformat": "^10.5.0",
+    "intl-messageformat": "^10.7.18",
     "next": "13.4.19",
     "next-themes": "^0.2.1",
     "postcss": "8.4.29",
