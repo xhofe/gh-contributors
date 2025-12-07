@@ -34,6 +34,6 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "lru-cache": "^10.4.3"
+    "lru-cache": "^11.2.4"
   }
 }
