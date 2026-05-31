@@ -9,31 +9,36 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.1.13",
+    "@heroui/react": "^2.8.10",
     "@react-aria/ssr": "^3.9.10",
     "@react-aria/visually-hidden": "^3.8.28",
     "@types/node": "20.5.7",
-    "@types/react": "18.2.21",
-    "@types/react-dom": "18.2.7",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "autoprefixer": "10.4.15",
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
-    "eslint": "8.48.0",
-    "eslint-config-next": "13.4.19",
-    "framer-motion": "^10.18.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.2.6",
+    "framer-motion": "^12.0.0",
     "intl-messageformat": "^10.7.18",
-    "next": "13.4.19",
-    "next-themes": "^0.2.1",
+    "next": "^16.2.6",
+    "next-themes": "^0.4.0",
     "postcss": "8.4.29",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "sharp": "^0.32.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.33.5",
     "swr": "^2.3.7",
     "tailwind-variants": "^0.1.20",
     "tailwindcss": "3.3.3",
-    "typescript": "5.0.4"
+    "typescript": "^5.8.0"
   },
   "devDependencies": {
     "lru-cache": "^10.4.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
   }
 }

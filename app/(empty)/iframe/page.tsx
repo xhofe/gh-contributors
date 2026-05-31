@@ -1,12 +1,13 @@
 "use client"
+import { Suspense } from "react"
 import { GhUserUse } from "@/app/api/types"
 import { calParams, fetcher } from "@/utils"
-import { Spinner } from "@nextui-org/react"
+import { Spinner } from "@heroui/react"
 import { useSearchParams } from "next/navigation"
 import useSWR from "swr"
 import { Error } from "./err"
 
-export default function Page() {
+function PageContent() {
   const searchParams = useSearchParams()
   const { data, error, isLoading } = useSWR<GhUserUse[] & { error?: string }>(
     `/api/json?${searchParams.toString()}`,
@@ -89,5 +90,19 @@ export default function Page() {
         ))
       )}
     </svg>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full w-full flex justify-center items-center">
+          <Spinner />
+        </div>
+      }
+    >
+      <PageContent />
+    </Suspense>
   )
 }

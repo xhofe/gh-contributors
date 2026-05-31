@@ -1,6 +1,6 @@
 "use client"
 
-import { Divider, Link, link } from "@nextui-org/react"
+import { Divider, Link, link } from "@heroui/react"
 import NextLink from "next/link"
 
 export function Footer() {

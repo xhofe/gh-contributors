@@ -8,7 +8,7 @@ import {
   Link,
   Pagination,
   Spinner,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import useSWR from "swr"
 

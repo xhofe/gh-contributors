@@ -6,7 +6,7 @@ import {
   NavbarItem,
   Button,
   Link,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { siteConfig } from "@/config/site"
 import { ThemeSwitch } from "@/components/theme-switch"
 import {

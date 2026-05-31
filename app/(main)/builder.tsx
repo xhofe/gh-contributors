@@ -10,7 +10,7 @@ import {
   Image,
   Input,
   Tooltip,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import copy from "copy-to-clipboard"
 import { useState, useMemo, useRef } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"

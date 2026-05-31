@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { title } from "@/components/primitives"
 import { Show } from "./show"
 
@@ -11,7 +12,9 @@ export default function Page() {
         <h2 className={title({ color: "indigo", size: "sm" })}>Used&nbsp;</h2>
         <h2 className={title({ size: "sm" })}>By</h2>
       </div>
-      <Show />
+      <Suspense>
+        <Show />
+      </Suspense>
     </section>
   )
 }
