@@ -12,7 +12,7 @@ COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc ./
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm@latest-10 && pnpm i; \
+  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm@latest-10 && pnpm i && pnpm approve-builds --all; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
