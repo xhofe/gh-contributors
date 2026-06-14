@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateSVG } from "./svg"
+import { fetchOrgRepos } from "./github"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const searchParams = req.nextUrl.searchParams
-    const repos = searchParams.getAll("repo")
+    let repos = searchParams.getAll("repo")
+    const org = searchParams.get("org")
+    const maxPages = parseInt(searchParams.get("pages") || "1")
+
+    if (org) {
+      const orgRepos = await fetchOrgRepos(org, maxPages)
+      repos = [...repos, ...orgRepos]
+    }
 
     if (repos.length === 0) {
-      throw new Error("repo is required")
+      throw new Error("repo or org is required")
     }
-    const maxPages = parseInt(searchParams.get("pages") || "1")
     const svg = await generateSVG({
       repos,
       maxPages,

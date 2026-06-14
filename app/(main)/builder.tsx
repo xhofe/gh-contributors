@@ -66,6 +66,7 @@ export function Builder() {
   const router = useRouter()
   const pathname = usePathname()
   const repos = searchParams.getAll("repo")
+  const org = searchParams.get("org") || ""
   function setRepos(_repos: string[]) {
     const params = new URLSearchParams()
     searchParams.forEach((value, key) => {
@@ -76,13 +77,25 @@ export function Builder() {
     _repos.forEach((repo) => params.append("repo", repo))
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }
+  function setOrg(value: string) {
+    const params = new URLSearchParams()
+    searchParams.forEach((v, key) => {
+      if (key !== "org") {
+        params.append(key, v)
+      }
+    })
+    if (value) {
+      params.set("org", value)
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
   const svg = useMemo(() => {
     const params = [] as string[]
     searchParams.forEach((value, key) => {
       params.push(`${key}=${value}`)
     })
     return `${location.origin}/api?` + params.join("&")
-  }, [repos])
+  }, [repos, org])
   const inputRef = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
   function add() {
@@ -149,6 +162,15 @@ export function Builder() {
           }}
         >
           <div className="flex gap-2 flex-wrap items-center font-mono w-full">
+            <Input
+              label="org"
+              placeholder="Input your github org to fetch all repos"
+              value={org}
+              onChange={(e) => {
+                setOrg(e.target.value.trim())
+              }}
+              size="sm"
+            />
             {options.map((option) => {
               if (["number", "string"].includes(option.type)) {
                 return (

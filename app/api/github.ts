@@ -90,6 +90,11 @@ export function usedBy(per_page: number, page: number) {
   }
 }
 
+const orgCache = new LRUCache<string, string[]>({
+  max: 100,
+  ttl: 1000 * 60 * 60 * 24,
+})
+
 const repoSF = new Singleflight()
 const avatarSF = new Singleflight()
 
@@ -184,6 +189,57 @@ export async function fetchRepos(repos: string[], maxPages?: number) {
       return arr.findIndex((t) => t.login === item.login) === index
     })
   return users
+}
+
+async function fetchOrgReposOnePage(org: string, page: number) {
+  const cacheKey = `${org}-${page}`
+  if (orgCache.has(cacheKey)) {
+    return orgCache.get(cacheKey)!
+  }
+  log(`fetching org:${org} repos page:${page}`)
+  let fetchInit: Parameters<typeof fetch>[1]
+  if (process.env.PAT) {
+    fetchInit = {
+      headers: {
+        Authorization: `Bearer ${process.env.PAT}`,
+      },
+    }
+  }
+  const res = await fetch(
+    `https://api.github.com/orgs/${org}/repos?per_page=100&page=${page}&type=public`,
+    fetchInit
+  )
+  if (res.status >= 400) {
+    throw new Error(`failed to fetch org [${org}]: ${res.status}`)
+  }
+  if (res.status !== 200) {
+    return []
+  }
+  const repos = await res.json()
+  if (repos.message) {
+    throw new Error(`failed to fetch org ${org}: ${repos.message}`)
+  }
+  const repoNames = repos.map((repo: any) => repo.full_name as string)
+  orgCache.set(cacheKey, repoNames)
+  return repoNames
+}
+
+export async function fetchOrgRepos(org: string, maxPages: number = 1) {
+  const repoRegex = /^[\w-]+$/
+  if (!repoRegex.test(org)) {
+    throw new Error(`invalid org: ${org}`)
+  }
+  const repoNames = [] as string[]
+  let page = 1
+  while (page <= maxPages) {
+    const reposPage = await fetchOrgReposOnePage(org, page)
+    if (reposPage.length === 0) {
+      break
+    }
+    repoNames.push(...reposPage)
+    page++
+  }
+  return repoNames
 }
 
 export async function fetchAvatar(url: string) {
